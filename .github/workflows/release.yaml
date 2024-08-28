@@ -5,13 +5,18 @@ name: release
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        registry: 
+          - 'https://registry.npmjs.org'
+          - 'https://npm.pkg.github.com'
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          registry-url: 'https://wombat-dressing-room.appspot.com'
+          registry-url: ${{ matrix.registry }}
       - run: npm ci
-      - run: npm publish
+      - run: npm publish --access public
         env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+          NODE_AUTH_TOKEN: ${{ matrix.registry == 'https://registry.npmjs.org' && secrets.NPM_TOKEN || secrets.GITHUB_TOKEN }}

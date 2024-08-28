@@ -1,11 +1,11 @@
 {
-  "name": "gts",
-  "version": "5.3.0",
-  "description": "Google TypeScript Style",
-  "repository": "google/gts",
+  "name": "@widesky/wsts",
+  "version": "0.0.1",
+  "description": "WideSky TypeScript Style",
+  "repository": "widesky/wsts",
   "main": "build/src/index.js",
   "bin": {
-    "gts": "build/src/cli.js"
+    "wsts": "build/src/cli.js"
   },
   "files": [
     "CHANGELOG.md",
@@ -13,7 +13,7 @@
     "build/template",
     "build/.eslintrc.json",
     ".prettierrc.json",
-    "tsconfig-google.json",
+    "tsconfig-widesky.json",
     "tsconfig.json",
     ".eslintrc.json"
   ],
@@ -28,14 +28,18 @@
     "system-test": "c8 mocha build/test/kitchen.js",
     "pretest": "npm run compile",
     "presystem-test": "npm run compile",
-    "license-check": "jsgl --local .",
     "fix": "eslint --fix '**/*.ts'"
   },
   "engines": {
     "node": ">=14"
   },
-  "keywords": ["typescript", "linter", "formatter", "google"],
-  "author": "Google Inc.",
+  "keywords": [
+    "typescript",
+    "linter",
+    "formatter",
+    "widesky"
+  ],
+  "author": "WideSky",
   "license": "Apache-2.0",
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "5.62.0",
@@ -72,7 +76,6 @@
     "cross-spawn": "^7.0.3",
     "fs-extra": "^11.0.0",
     "inline-fixtures": "^1.1.0",
-    "js-green-licenses": "^4.0.0",
     "mocha": "^10.0.0",
     "sinon": "^17.0.0",
     "tmp": "0.2.3",

@@ -29,7 +29,7 @@ import {Options} from '../src/cli';
 import * as init from '../src/init';
 
 const OPTIONS: Options = {
-  gtsRootDir: path.resolve(__dirname, '../..'),
+  wstsRootDir: path.resolve(__dirname, '../..'),
   targetRootDir: './',
   dryRun: false,
   yes: false,
@@ -53,7 +53,7 @@ function hasExpectedScripts(packageJson: PackageJson): boolean {
 function hasExpectedDependencies(packageJson: PackageJson): boolean {
   return (
     !!packageJson.devDependencies &&
-    ['gts', 'typescript'].every(d => !!packageJson.devDependencies![d])
+    ['wsts', 'typescript'].every(d => !!packageJson.devDependencies![d])
   );
 }
 
@@ -123,7 +123,7 @@ describe('init', () => {
 
   it('addDependencies should not edit existing deps on no', async () => {
     const DEPS: DefaultPackage = {
-      gts: 'something',
+      wsts: 'something',
       typescript: 'or the other',
       '@types/node': 'or another',
     };
@@ -138,7 +138,7 @@ describe('init', () => {
   });
 
   it('addDependencies should edit existing deps on yes', async () => {
-    const DEPS = {gts: 'something', typescript: 'or the other'};
+    const DEPS = {wsts: 'something', typescript: 'or the other'};
     const pkg: PackageJson = {
       ...MINIMAL_PACKAGE_JSON,
       devDependencies: {...DEPS},
