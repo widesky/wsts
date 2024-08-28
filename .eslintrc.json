@@ -6,7 +6,8 @@
   ],
   "plugins": [
     "n",
-    "prettier"
+    "prettier",
+    "jsdoc"
   ],
   "rules": {
     "prettier/prettier": "error",
@@ -28,7 +29,9 @@
         "object": "it",
         "property": "only"
       }
-    ]
+    ],
+    "jsdoc/require-description": "error",
+    "jsdoc/check-values": "error"
   },
   "overrides": [
     {
