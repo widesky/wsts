@@ -7,7 +7,8 @@
   "plugins": [
     "n",
     "prettier",
-    "jsdoc"
+    "jsdoc",
+    "@stylistic"
   ],
   "rules": {
     "prettier/prettier": "error",
@@ -31,7 +32,13 @@
       }
     ],
     "jsdoc/require-description": "error",
-    "jsdoc/check-values": "error"
+    "jsdoc/check-values": "error",
+    "@stylistic/space-before-function-paren": ["error", "never"],
+    "@stylistic/max-len": ["error", {
+        "code": 100,
+        "tabWidth": 4
+    }],
+    "@stylistic/indent": ["error", 4]
   },
   "overrides": [
     {
