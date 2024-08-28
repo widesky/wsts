@@ -26,26 +26,26 @@ export const rimrafp = promisify(rimraf);
 export const ncpp = promisify(ncp.ncp);
 
 export interface Bag<T> {
-  [script: string]: T;
+    [script: string]: T;
 }
 
 export interface DefaultPackage extends Bag<string> {
-  wsts: string;
-  typescript: string;
-  '@types/node': string;
+    '@widesky/wsts': string;
+    typescript: string;
+    '@types/node': string;
 }
 
 export async function readJsonp(jsonPath: string) {
-  const contents = await readFilep(jsonPath, {encoding: 'utf8'});
-  return JSON5.parse(contents);
+    const contents = await readFilep(jsonPath, {encoding: 'utf8'});
+    return JSON5.parse(contents);
 }
 
 export interface ReadFileP {
-  (path: string, encoding: string): Promise<string>;
+    (path: string, encoding: string): Promise<string>;
 }
 
 export function nop() {
-  /* empty */
+    /* empty */
 }
 
 /**
@@ -58,49 +58,49 @@ export function nop() {
  * returns a ConfigFile object containing the data from all the dependencies
  */
 async function getBase(
-  filePath: string,
-  customReadFilep: ReadFileP,
-  readFiles: Set<string>,
-  currentDir: string
+    filePath: string,
+    customReadFilep: ReadFileP,
+    readFiles: Set<string>,
+    currentDir: string
 ): Promise<ConfigFile> {
-  customReadFilep = customReadFilep || readFilep;
+    customReadFilep = customReadFilep || readFilep;
 
-  filePath = path.resolve(currentDir, filePath);
+    filePath = path.resolve(currentDir, filePath);
 
-  // An error is thrown if there is a circular reference as specified by the
-  // TypeScript doc
-  if (readFiles.has(filePath)) {
-    throw new Error(`Circular reference in ${filePath}`);
-  }
-  readFiles.add(filePath);
-  try {
-    const json = await customReadFilep(filePath, 'utf8');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let contents: any;
+    // An error is thrown if there is a circular reference as specified by the
+    // TypeScript doc
+    if (readFiles.has(filePath)) {
+        throw new Error(`Circular reference in ${filePath}`);
+    }
+    readFiles.add(filePath);
     try {
-      contents = JSON5.parse(json);
+        const json = await customReadFilep(filePath, 'utf8');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let contents: any;
+        try {
+            contents = JSON5.parse(json);
+        } catch (e) {
+            const err = e as Error;
+            err.message = `Unable to parse ${filePath}!\n${err.message}`;
+            throw err;
+        }
+
+        if (contents.extends) {
+            const nextFile = await getBase(
+                contents.extends,
+                customReadFilep,
+                readFiles,
+                path.dirname(filePath)
+            );
+            contents = combineTSConfig(nextFile, contents);
+        }
+
+        return contents;
     } catch (e) {
-      const err = e as Error;
-      err.message = `Unable to parse ${filePath}!\n${err.message}`;
-      throw err;
+        const err = e as Error;
+        err.message = `Error: ${filePath}\n${err.message}`;
+        throw err;
     }
-
-    if (contents.extends) {
-      const nextFile = await getBase(
-        contents.extends,
-        customReadFilep,
-        readFiles,
-        path.dirname(filePath)
-      );
-      contents = combineTSConfig(nextFile, contents);
-    }
-
-    return contents;
-  } catch (e) {
-    const err = e as Error;
-    err.message = `Error: ${filePath}\n${err.message}`;
-    throw err;
-  }
 }
 
 /**
@@ -109,27 +109,23 @@ async function getBase(
  * @param inherited is then loaded and overwrites base
  */
 function combineTSConfig(base: ConfigFile, inherited: ConfigFile): ConfigFile {
-  const result: ConfigFile = {compilerOptions: {}};
+    const result: ConfigFile = {compilerOptions: {}};
 
-  Object.assign(result, base, inherited);
-  Object.assign(
-    result.compilerOptions!,
-    base.compilerOptions!,
-    inherited.compilerOptions!
-  );
-  delete result.extends;
-  return result;
+    Object.assign(result, base, inherited);
+    Object.assign(result.compilerOptions!, base.compilerOptions!, inherited.compilerOptions!);
+    delete result.extends;
+    return result;
 }
 
 /**
  * An interface containing the top level data fields present in Config Files
  */
 export interface ConfigFile {
-  files?: string[];
-  compilerOptions?: {};
-  include?: string[];
-  exclude?: string[];
-  extends?: string[];
+    files?: string[];
+    compilerOptions?: {};
+    include?: string[];
+    exclude?: string[];
+    extends?: string[];
 }
 
 /**
@@ -138,16 +134,14 @@ export interface ConfigFile {
  * - If only package-lock.json or both exist, use npm
  */
 export function isYarnUsed(existsSync = fs.existsSync): boolean {
-  if (existsSync('package-lock.json')) {
-    return false;
-  }
-  return existsSync('yarn.lock');
+    if (existsSync('package-lock.json')) {
+        return false;
+    }
+    return existsSync('yarn.lock');
 }
 
 export function getPkgManagerCommand(isYarnUsed?: boolean): string {
-  return (
-    (isYarnUsed ? 'yarn' : 'npm') + (process.platform === 'win32' ? '.cmd' : '')
-  );
+    return (isYarnUsed ? 'yarn' : 'npm') + (process.platform === 'win32' ? '.cmd' : '');
 }
 
 /**
@@ -158,10 +152,10 @@ export function getPkgManagerCommand(isYarnUsed?: boolean): string {
  * thrown
  */
 export async function getTSConfig(
-  rootDir: string,
-  customReadFilep?: ReadFileP
+    rootDir: string,
+    customReadFilep?: ReadFileP
 ): Promise<ConfigFile> {
-  customReadFilep = (customReadFilep || readFilep) as ReadFileP;
-  const readArr = new Set<string>();
-  return getBase('tsconfig.json', customReadFilep, readArr, rootDir);
+    customReadFilep = (customReadFilep || readFilep) as ReadFileP;
+    const readArr = new Set<string>();
+    return getBase('tsconfig.json', customReadFilep, readArr, rootDir);
 }
