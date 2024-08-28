@@ -33,9 +33,9 @@
     ],
     "jsdoc/require-description": "error",
     "jsdoc/check-values": "error",
-    "@stylistic/space-before-function-paren": ["error", "never"],
     "@stylistic/max-len": ["error", {
         "code": 100,
+        "ignoreTrailingComments": true,
         "tabWidth": 4
     }],
     "@stylistic/indent": ["error", 4]
