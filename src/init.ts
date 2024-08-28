@@ -124,7 +124,7 @@ export async function addDependencies(
 ): Promise<boolean> {
   let edits = false;
   const deps: DefaultPackage = {
-    wsts: `^${pkg.version}`,
+    '@widesky/wsts': `^${pkg.version}`,
     typescript: pkg.devDependencies.typescript,
     '@types/node': pkg.devDependencies['@types/node'],
   };
@@ -178,7 +178,7 @@ async function writePackageJson(
 }
 
 export const ESLINT_CONFIG = {
-  extends: './node_modules/wsts/',
+  extends: './node_modules/@widesky/wsts/',
 };
 
 export const ESLINT_IGNORE = 'build/\n';
@@ -236,7 +236,7 @@ async function generateESLintIgnore(options: Options): Promise<void> {
 
 async function generateTsConfig(options: Options): Promise<void> {
   const config = formatJson({
-    extends: './node_modules/wsts/tsconfig-widesky.json',
+    extends: './node_modules/@widesky/wsts/tsconfig-widesky.json',
     compilerOptions: {rootDir: '.', outDir: 'build'},
     include: ['src/**/*.ts', 'test/**/*.ts'],
   });
@@ -245,7 +245,7 @@ async function generateTsConfig(options: Options): Promise<void> {
 
 async function generatePrettierConfig(options: Options): Promise<void> {
   const style = `module.exports = {
-  ...require('wsts/.prettierrc.json')
+  ...require('@widesky/wsts/.prettierrc.json')
 }
 `;
   return generateConfigFile(options, './.prettierrc.js', style);
