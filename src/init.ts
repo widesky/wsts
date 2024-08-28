@@ -22,11 +22,11 @@ import * as util from 'util';
 import * as writeFileAtomic from 'write-file-atomic';
 
 import {
-  getPkgManagerCommand,
-  readFilep as read,
-  readJsonp as readJson,
-  Bag,
-  DefaultPackage,
+    getPkgManagerCommand,
+    readFilep as read,
+    readJsonp as readJson,
+    Bag,
+    DefaultPackage,
 } from './util';
 
 import {Options} from './cli';
@@ -39,220 +39,206 @@ const pkg = require('../../package.json');
 const ncpp = util.promisify(ncp);
 
 const DEFAULT_PACKAGE_JSON: PackageJson = {
-  name: '',
-  version: '0.0.0',
-  description: '',
-  main: 'build/src/index.js',
-  types: 'build/src/index.d.ts',
-  files: ['build/src'],
-  license: 'Apache-2.0',
-  keywords: [],
-  scripts: {test: 'echo "Error: no test specified" && exit 1'},
+    name: '',
+    version: '0.0.0',
+    description: '',
+    main: 'build/src/index.js',
+    types: 'build/src/index.d.ts',
+    files: ['build/src'],
+    license: 'Apache-2.0',
+    keywords: [],
+    scripts: {test: 'echo "Error: no test specified" && exit 1'},
 };
 
 async function query(
-  message: string,
-  question: string,
-  defaultVal: boolean,
-  options: Options
+    message: string,
+    question: string,
+    defaultVal: boolean,
+    options: Options
 ): Promise<boolean> {
-  if (options.yes) {
-    return true;
-  } else if (options.no) {
-    return false;
-  }
+    if (options.yes) {
+        return true;
+    } else if (options.no) {
+        return false;
+    }
 
-  if (message) {
-    options.logger.log(message);
-  }
+    if (message) {
+        options.logger.log(message);
+    }
 
-  const answers: inquirer.Answers = await inquirer.prompt({
-    type: 'confirm',
-    name: 'query',
-    message: question,
-    default: defaultVal,
-  });
-  return answers.query;
+    const answers: inquirer.Answers = await inquirer.prompt({
+        type: 'confirm',
+        name: 'query',
+        message: question,
+        default: defaultVal,
+    });
+    return answers.query;
 }
 
-export async function addScripts(
-  packageJson: PackageJson,
-  options: Options
-): Promise<boolean> {
-  let edits = false;
-  const pkgManager = getPkgManagerCommand(options.yarn);
-  const scripts: Bag<string> = {
-    lint: 'wsts lint',
-    clean: 'wsts clean',
-    compile: 'tsc',
-    fix: 'wsts fix',
-    prepare: `${pkgManager} run compile`,
-    pretest: `${pkgManager} run compile`,
-    posttest: `${pkgManager} run lint`,
-  };
+export async function addScripts(packageJson: PackageJson, options: Options): Promise<boolean> {
+    let edits = false;
+    const pkgManager = getPkgManagerCommand(options.yarn);
+    const scripts: Bag<string> = {
+        lint: 'wsts lint',
+        clean: 'wsts clean',
+        compile: 'tsc',
+        fix: 'wsts fix',
+        prepare: `${pkgManager} run compile`,
+        pretest: `${pkgManager} run compile`,
+        posttest: `${pkgManager} run lint`,
+    };
 
-  if (!packageJson.scripts) {
-    packageJson.scripts = {};
-  }
-
-  for (const script of Object.keys(scripts)) {
-    let install = true;
-    const existing = packageJson.scripts[script];
-    const target = scripts[script];
-
-    if (existing !== target) {
-      if (existing) {
-        const message =
-          `package.json already has a script for ${chalk.bold(script)}:\n` +
-          `-${chalk.red(existing)}\n+${chalk.green(target)}`;
-        install = await query(message, 'Replace', false, options);
-      }
-
-      if (install) {
-        // eslint-disable-next-line require-atomic-updates
-        packageJson.scripts[script] = scripts[script];
-        edits = true;
-      }
+    if (!packageJson.scripts) {
+        packageJson.scripts = {};
     }
-  }
-  return edits;
+
+    for (const script of Object.keys(scripts)) {
+        let install = true;
+        const existing = packageJson.scripts[script];
+        const target = scripts[script];
+
+        if (existing !== target) {
+            if (existing) {
+                const message =
+                    `package.json already has a script for ${chalk.bold(script)}:\n` +
+                    `-${chalk.red(existing)}\n+${chalk.green(target)}`;
+                install = await query(message, 'Replace', false, options);
+            }
+
+            if (install) {
+                // eslint-disable-next-line require-atomic-updates
+                packageJson.scripts[script] = scripts[script];
+                edits = true;
+            }
+        }
+    }
+    return edits;
 }
 
 export async function addDependencies(
-  packageJson: PackageJson,
-  options: Options
+    packageJson: PackageJson,
+    options: Options
 ): Promise<boolean> {
-  let edits = false;
-  const deps: DefaultPackage = {
-    '@widesky/wsts': `^${pkg.version}`,
-    typescript: pkg.devDependencies.typescript,
-    '@types/node': pkg.devDependencies['@types/node'],
-  };
+    let edits = false;
+    const deps: DefaultPackage = {
+        '@widesky/wsts': `^${pkg.version}`,
+        typescript: pkg.devDependencies.typescript,
+        '@types/node': pkg.devDependencies['@types/node'],
+    };
 
-  if (!packageJson.devDependencies) {
-    packageJson.devDependencies = {};
-  }
-
-  for (const dep of Object.keys(deps)) {
-    let install = true;
-    const existing = packageJson.devDependencies[dep];
-    const target = deps[dep];
-
-    if (existing !== target) {
-      if (existing) {
-        const message =
-          `Already have devDependency for ${chalk.bold(dep)}:\n` +
-          `-${chalk.red(existing)}\n+${chalk.green(target)}`;
-        install = await query(message, 'Overwrite', false, options);
-      }
-
-      if (install) {
-        // eslint-disable-next-line require-atomic-updates
-        packageJson.devDependencies[dep] = deps[dep];
-        edits = true;
-      }
+    if (!packageJson.devDependencies) {
+        packageJson.devDependencies = {};
     }
-  }
 
-  return edits;
+    for (const dep of Object.keys(deps)) {
+        let install = true;
+        const existing = packageJson.devDependencies[dep];
+        const target = deps[dep];
+
+        if (existing !== target) {
+            if (existing) {
+                const message =
+                    `Already have devDependency for ${chalk.bold(dep)}:\n` +
+                    `-${chalk.red(existing)}\n+${chalk.green(target)}`;
+                install = await query(message, 'Overwrite', false, options);
+            }
+
+            if (install) {
+                // eslint-disable-next-line require-atomic-updates
+                packageJson.devDependencies[dep] = deps[dep];
+                edits = true;
+            }
+        }
+    }
+
+    return edits;
 }
 
 function formatJson(object: {}) {
-  const json = JSON.stringify(object, null, '  ');
-  return `${json}\n`;
+    const json = JSON.stringify(object, null, '  ');
+    return `${json}\n`;
 }
 
-async function writePackageJson(
-  packageJson: PackageJson,
-  options: Options
-): Promise<void> {
-  options.logger.log('Writing package.json...');
-  if (!options.dryRun) {
-    await writeFileAtomic('./package.json', formatJson(packageJson));
-  }
-  const preview = {
-    scripts: packageJson.scripts,
-    devDependencies: packageJson.devDependencies,
-  };
-  options.logger.dir(preview);
+async function writePackageJson(packageJson: PackageJson, options: Options): Promise<void> {
+    options.logger.log('Writing package.json...');
+    if (!options.dryRun) {
+        await writeFileAtomic('./package.json', formatJson(packageJson));
+    }
+    const preview = {
+        scripts: packageJson.scripts,
+        devDependencies: packageJson.devDependencies,
+    };
+    options.logger.dir(preview);
 }
 
 export const ESLINT_CONFIG = {
-  extends: './node_modules/@widesky/wsts/',
+    extends: './node_modules/@widesky/wsts/',
 };
 
 export const ESLINT_IGNORE = 'build/\n';
 
-async function generateConfigFile(
-  options: Options,
-  filename: string,
-  contents: string
-) {
-  let existing;
-  try {
-    existing = await read(filename, 'utf8');
-  } catch (e) {
-    const err = e as Error & {code?: string};
-    if (err.code === 'ENOENT') {
-      /* not found, create it. */
-    } else {
-      throw new Error(`Unknown error reading ${filename}: ${err.message}`);
+async function generateConfigFile(options: Options, filename: string, contents: string) {
+    let existing;
+    try {
+        existing = await read(filename, 'utf8');
+    } catch (e) {
+        const err = e as Error & {code?: string};
+        if (err.code === 'ENOENT') {
+            /* not found, create it. */
+        } else {
+            throw new Error(`Unknown error reading ${filename}: ${err.message}`);
+        }
     }
-  }
 
-  let writeFile = true;
-  if (existing && existing === contents) {
-    options.logger.log(`No edits needed in ${filename}`);
-    return;
-  } else if (existing) {
-    writeFile = await query(
-      `${chalk.bold(filename)} already exists`,
-      'Overwrite',
-      false,
-      options
-    );
-  }
-
-  if (writeFile) {
-    options.logger.log(`Writing ${filename}...`);
-    if (!options.dryRun) {
-      await writeFileAtomic(filename, contents);
+    let writeFile = true;
+    if (existing && existing === contents) {
+        options.logger.log(`No edits needed in ${filename}`);
+        return;
+    } else if (existing) {
+        writeFile = await query(
+            `${chalk.bold(filename)} already exists`,
+            'Overwrite',
+            false,
+            options
+        );
     }
-    options.logger.log(contents);
-  }
+
+    if (writeFile) {
+        options.logger.log(`Writing ${filename}...`);
+        if (!options.dryRun) {
+            await writeFileAtomic(filename, contents);
+        }
+        options.logger.log(contents);
+    }
 }
 
 async function generateESLintConfig(options: Options): Promise<void> {
-  return generateConfigFile(
-    options,
-    './.eslintrc.json',
-    formatJson(ESLINT_CONFIG)
-  );
+    return generateConfigFile(options, './.eslintrc.json', formatJson(ESLINT_CONFIG));
 }
 
 async function generateESLintIgnore(options: Options): Promise<void> {
-  return generateConfigFile(options, './.eslintignore', ESLINT_IGNORE);
+    return generateConfigFile(options, './.eslintignore', ESLINT_IGNORE);
 }
 
 async function generateTsConfig(options: Options): Promise<void> {
-  const config = formatJson({
-    extends: './node_modules/@widesky/wsts/tsconfig-widesky.json',
-    compilerOptions: {rootDir: '.', outDir: 'build'},
-    include: ['src/**/*.ts', 'test/**/*.ts'],
-  });
-  return generateConfigFile(options, './tsconfig.json', config);
+    const config = formatJson({
+        extends: './node_modules/@widesky/wsts/tsconfig-widesky.json',
+        compilerOptions: {rootDir: '.', outDir: 'build'},
+        include: ['src/**/*.ts', 'test/**/*.ts'],
+    });
+    return generateConfigFile(options, './tsconfig.json', config);
 }
 
 async function generatePrettierConfig(options: Options): Promise<void> {
-  const style = `module.exports = {
+    const style = `module.exports = {
   ...require('@widesky/wsts/.prettierrc.json')
 }
 `;
-  return generateConfigFile(options, './.prettierrc.js', style);
+    return generateConfigFile(options, './.prettierrc.js', style);
 }
 
 async function generateEditorConfig(options: Options): Promise<void> {
-  const config = `root = true
+    const config = `root = true
 
 [*]
 indent_style = space
@@ -261,96 +247,91 @@ end_of_line = lf
 charset = utf-8
 insert_final_newline = true
 `;
-  return generateConfigFile(options, './.editorconfig', config);
+    return generateConfigFile(options, './.editorconfig', config);
 }
 
-export async function installDefaultTemplate(
-  options: Options
-): Promise<boolean> {
-  const cwd = process.cwd();
-  const sourceDirName = path.join(__dirname, '../template');
-  const targetDirName = path.join(cwd, 'src');
+export async function installDefaultTemplate(options: Options): Promise<boolean> {
+    const cwd = process.cwd();
+    const sourceDirName = path.join(__dirname, '../template');
+    const targetDirName = path.join(cwd, 'src');
 
-  try {
-    fs.mkdirSync(targetDirName);
-  } catch (e) {
-    const err = e as Error & {code?: string};
-    if (err.code !== 'EEXIST') {
-      throw err;
+    try {
+        fs.mkdirSync(targetDirName);
+    } catch (e) {
+        const err = e as Error & {code?: string};
+        if (err.code !== 'EEXIST') {
+            throw err;
+        }
+        // Else, continue and populate files into the existing directory.
     }
-    // Else, continue and populate files into the existing directory.
-  }
 
-  // Only install the template if no ts files exist in target directory.
-  const files = fs.readdirSync(targetDirName);
-  const tsFiles = files.filter(file => file.toLowerCase().endsWith('.ts'));
-  if (tsFiles.length !== 0) {
-    options.logger.log(
-      'Target src directory already has ts files. ' +
-        'Template files not installed.'
-    );
-    return false;
-  }
-  await ncpp(sourceDirName, targetDirName);
-  options.logger.log('Default template installed.');
-  return true;
+    // Only install the template if no ts files exist in target directory.
+    const files = fs.readdirSync(targetDirName);
+    const tsFiles = files.filter(file => file.toLowerCase().endsWith('.ts'));
+    if (tsFiles.length !== 0) {
+        options.logger.log(
+            'Target src directory already has ts files. ' + 'Template files not installed.'
+        );
+        return false;
+    }
+    await ncpp(sourceDirName, targetDirName);
+    options.logger.log('Default template installed.');
+    return true;
 }
 
 export async function init(options: Options): Promise<boolean> {
-  let generatedPackageJson = false;
-  let packageJson;
-  try {
-    packageJson = await readJson('./package.json');
-  } catch (e) {
-    const err = e as Error & {code?: string};
-    if (err.code !== 'ENOENT') {
-      throw new Error(`Unable to open package.json file: ${err.message}`);
+    let generatedPackageJson = false;
+    let packageJson;
+    try {
+        packageJson = await readJson('./package.json');
+    } catch (e) {
+        const err = e as Error & {code?: string};
+        if (err.code !== 'ENOENT') {
+            throw new Error(`Unable to open package.json file: ${err.message}`);
+        }
+        const generate = await query(
+            `${chalk.bold('package.json')} does not exist.`,
+            'Generate',
+            true,
+            options
+        );
+
+        if (!generate) {
+            options.logger.log('Please run from a directory with your package.json.');
+            return false;
+        }
+
+        packageJson = DEFAULT_PACKAGE_JSON;
+        generatedPackageJson = true;
     }
-    const generate = await query(
-      `${chalk.bold('package.json')} does not exist.`,
-      'Generate',
-      true,
-      options
-    );
 
-    if (!generate) {
-      options.logger.log('Please run from a directory with your package.json.');
-      return false;
+    const [addedDeps, addedScripts] = await Promise.all([
+        addDependencies(packageJson, options),
+        addScripts(packageJson, options),
+    ]);
+    if (generatedPackageJson || addedDeps || addedScripts) {
+        await writePackageJson(packageJson, options);
+    } else {
+        options.logger.log('No edits needed in package.json.');
+    }
+    await Promise.all([
+        generateTsConfig(options),
+        generateESLintConfig(options),
+        generateESLintIgnore(options),
+        generatePrettierConfig(options),
+        generateEditorConfig(options),
+    ]);
+    await installDefaultTemplate(options);
+
+    // Run `npm install` after initial setup so `npm run lint` works right away.
+    if (!options.dryRun) {
+        // --ignore-scripts so that compilation doesn't happen because there's no
+        // source files yet.
+
+        cp.spawnSync(getPkgManagerCommand(options.yarn), ['install', '--ignore-scripts'], {
+            stdio: 'inherit',
+        });
     }
 
-    packageJson = DEFAULT_PACKAGE_JSON;
-    generatedPackageJson = true;
-  }
-
-  const [addedDeps, addedScripts] = await Promise.all([
-    addDependencies(packageJson, options),
-    addScripts(packageJson, options),
-  ]);
-  if (generatedPackageJson || addedDeps || addedScripts) {
-    await writePackageJson(packageJson, options);
-  } else {
-    options.logger.log('No edits needed in package.json.');
-  }
-  await Promise.all([
-    generateTsConfig(options),
-    generateESLintConfig(options),
-    generateESLintIgnore(options),
-    generatePrettierConfig(options),
-    generateEditorConfig(options),
-  ]);
-  await installDefaultTemplate(options);
-
-  // Run `npm install` after initial setup so `npm run lint` works right away.
-  if (!options.dryRun) {
-    // --ignore-scripts so that compilation doesn't happen because there's no
-    // source files yet.
-
-    cp.spawnSync(
-      getPkgManagerCommand(options.yarn),
-      ['install', '--ignore-scripts'],
-      {stdio: 'inherit'}
-    );
-  }
-
-  return true;
+    return true;
 }

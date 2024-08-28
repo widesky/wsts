@@ -24,31 +24,31 @@ import {isYarnUsed} from './util';
 import * as execa from 'execa';
 
 export interface Logger {
-  log: (...args: Array<{}>) => void;
-  error: (...args: Array<{}>) => void;
-  dir: (obj: {}, options?: {}) => void;
+    log: (...args: Array<{}>) => void;
+    error: (...args: Array<{}>) => void;
+    dir: (obj: {}, options?: {}) => void;
 }
 
 export interface Options {
-  dryRun: boolean;
-  wstsRootDir: string;
-  targetRootDir: string;
-  yes: boolean;
-  no: boolean;
-  logger: Logger;
-  yarn?: boolean;
+    dryRun: boolean;
+    wstsRootDir: string;
+    targetRootDir: string;
+    yes: boolean;
+    no: boolean;
+    logger: Logger;
+    yarn?: boolean;
 }
 
 export type VerbFilesFunction = (
-  options: Options,
-  files: string[],
-  fix?: boolean
+    options: Options,
+    files: string[],
+    fix?: boolean
 ) => Promise<boolean>;
 
 const logger: Logger = console;
 
 const cli = meow({
-  help: `
+    help: `
 	Usage
 	  $ wsts <verb> [<file>...] [options]
 
@@ -72,13 +72,13 @@ const cli = meow({
     $ wsts fix
     $ wsts fix src/file1.ts src/file2.ts
     $ wsts clean`,
-  flags: {
-    help: {type: 'boolean'},
-    yes: {type: 'boolean', alias: 'y'},
-    no: {type: 'boolean', alias: 'n'},
-    dryRun: {type: 'boolean'},
-    yarn: {type: 'boolean'},
-  },
+    flags: {
+        help: {type: 'boolean'},
+        yes: {type: 'boolean', alias: 'y'},
+        no: {type: 'boolean', alias: 'n'},
+        dryRun: {type: 'boolean'},
+        yarn: {type: 'boolean'},
+    },
 });
 
 /**
@@ -87,91 +87,85 @@ const cli = meow({
  * @private
  */
 export function getNodeVersion() {
-  return process.version;
+    return process.version;
 }
 
 function usage(msg?: string): void {
-  if (msg) {
-    logger.error(msg);
-  }
-  cli.showHelp(1);
+    if (msg) {
+        logger.error(msg);
+    }
+    cli.showHelp(1);
 }
 
 export async function run(verb: string, files: string[]): Promise<boolean> {
-  // throw if running on an old version of nodejs
-  const nodeMajorVersion = Number(getNodeVersion().slice(1).split('.')[0]);
-  console.log(`version: ${nodeMajorVersion}`);
-  if (nodeMajorVersion < 10) {
-    throw new Error(
-      `wsts requires node.js 10.x or up. You are currently running
+    // throw if running on an old version of nodejs
+    const nodeMajorVersion = Number(getNodeVersion().slice(1).split('.')[0]);
+    console.log(`version: ${nodeMajorVersion}`);
+    if (nodeMajorVersion < 10) {
+        throw new Error(
+            `wsts requires node.js 10.x or up. You are currently running
       ${process.version}, which is not supported. Please upgrade to
       a safe, secure version of nodejs!`
-    );
-  }
-
-  const options = {
-    dryRun: cli.flags.dryRun || false,
-    // Paths are relative to the transpiled output files.
-    wstsRootDir: path.resolve(__dirname, '../..'),
-    targetRootDir: process.cwd(),
-    yes: cli.flags.yes || cli.flags.y || false,
-    no: cli.flags.no || cli.flags.n || false,
-    logger,
-    yarn: cli.flags.yarn || isYarnUsed(),
-  } as Options;
-  // Linting/formatting depend on typescript. We don't want to load the
-  // typescript module during init, since it might not exist.
-  // See: https://github.com/google/gts/issues/48
-  if (verb === 'init') {
-    return init(options);
-  }
-
-  const flags = Object.assign([], files);
-  if (flags.length === 0) {
-    flags.push(
-      '**/*.ts',
-      '**/*.js',
-      '**/*.tsx',
-      '**/*.jsx',
-      '--no-error-on-unmatched-pattern'
-    );
-  }
-
-  switch (verb) {
-    case 'lint':
-    case 'check': {
-      try {
-        await execa('eslint', flags, {stdio: 'inherit'});
-        return true;
-      } catch (e) {
-        return false;
-      }
+        );
     }
-    case 'fix': {
-      const fixFlag = options.dryRun ? '--fix-dry-run' : '--fix';
-      try {
-        await execa('eslint', [fixFlag, ...flags], {stdio: 'inherit'});
-        return true;
-      } catch (e) {
-        console.error(e);
-        return false;
-      }
+
+    const options = {
+        dryRun: cli.flags.dryRun || false,
+        // Paths are relative to the transpiled output files.
+        wstsRootDir: path.resolve(__dirname, '../..'),
+        targetRootDir: process.cwd(),
+        yes: cli.flags.yes || cli.flags.y || false,
+        no: cli.flags.no || cli.flags.n || false,
+        logger,
+        yarn: cli.flags.yarn || isYarnUsed(),
+    } as Options;
+    // Linting/formatting depend on typescript. We don't want to load the
+    // typescript module during init, since it might not exist.
+    // See: https://github.com/google/gts/issues/48
+    if (verb === 'init') {
+        return init(options);
     }
-    case 'clean':
-      return clean(options);
-    default:
-      usage(`Unknown verb: ${verb}`);
-      return false;
-  }
+
+    const flags = Object.assign([], files);
+    if (flags.length === 0) {
+        flags.push('**/*.ts', '**/*.js', '**/*.tsx', '**/*.jsx', '--no-error-on-unmatched-pattern');
+    }
+
+    switch (verb) {
+        case 'lint':
+        case 'check': {
+            try {
+                await execa('eslint', flags, {stdio: 'inherit'});
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+        case 'fix': {
+            const fixFlag = options.dryRun ? '--fix-dry-run' : '--fix';
+            try {
+                await execa('eslint', [fixFlag, ...flags], {stdio: 'inherit'});
+                return true;
+            } catch (e) {
+                console.error(e);
+                return false;
+            }
+        }
+        case 'clean':
+            return clean(options);
+        default:
+            usage(`Unknown verb: ${verb}`);
+            return false;
+    }
 }
 
 if (cli.input.length < 1) {
-  usage();
+    usage();
 }
 
 run(cli.input[0], cli.input.slice(1)).then(success => {
-  if (!success) {
-    // eslint-disable-next-line n/no-process-exit
-    process.exit(1);
-  }
+    if (!success) {
+        // eslint-disable-next-line n/no-process-exit
+        process.exit(1);
+    }
 });

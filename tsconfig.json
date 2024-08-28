@@ -1,16 +1,10 @@
 {
-  "extends": "./tsconfig-widesky.json",
-  "compilerOptions": {
-    "rootDir": ".",
-    "outDir": "build",
-    "resolveJsonModule": true
-  },
-  "include": [
-    "src/**/*.ts",
-    "test/**/*.ts"
-  ],
-  "exclude": [
-    "test/fixtures/**/*.*",
-    "template/**/*.*",
-  ]
+    "extends": "./tsconfig-widesky.json",
+    "compilerOptions": {
+        "rootDir": ".",
+        "outDir": "build",
+        "resolveJsonModule": true
+    },
+    "include": ["src/**/*.ts", "test/**/*.ts"],
+    "exclude": ["test/fixtures/**/*.*", "template/**/*.*"]
 }
