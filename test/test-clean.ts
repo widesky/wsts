@@ -26,7 +26,7 @@ import {describe, it} from 'mocha';
 
 describe('clean', () => {
   const OPTIONS = {
-    gtsRootDir: path.resolve(__dirname, '../..'),
+    wstsRootDir: path.resolve(__dirname, '../..'),
     targetRootDir: './',
     dryRun: false,
     yes: false,

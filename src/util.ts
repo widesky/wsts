@@ -30,7 +30,7 @@ export interface Bag<T> {
 }
 
 export interface DefaultPackage extends Bag<string> {
-  gts: string;
+  wsts: string;
   typescript: string;
   '@types/node': string;
 }

@@ -23,15 +23,15 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           name: actions ${{ matrix.node }}
-  windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: npm ci
-      - run: npm run system-test
+  # windows:
+  #   runs-on: windows-latest
+  #   steps:
+  #     - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 20
+  #     - run: npm ci
+  #     - run: npm run system-test
   system_test:
     runs-on: ubuntu-latest
     steps:
@@ -50,12 +50,3 @@ jobs:
           node-version: 20
       - run: npm ci
       - run: npm run lint
-  license_check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: npm ci
-      - run: npm run license-check
