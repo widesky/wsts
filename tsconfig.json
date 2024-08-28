@@ -1,5 +1,5 @@
 {
-  "extends": "./tsconfig-google.json",
+  "extends": "./tsconfig-widesky.json",
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "build",
