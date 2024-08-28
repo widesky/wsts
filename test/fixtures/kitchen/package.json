@@ -3,6 +3,6 @@
   "version": "1.0.0",
   "devDependencies": {
     "typescript": "^5.4.3",
-    "gts": "file:../gts.tgz"
+    "wsts": "file:../wsts.tgz"
   }
 }

@@ -82,10 +82,10 @@ export async function addScripts(
   let edits = false;
   const pkgManager = getPkgManagerCommand(options.yarn);
   const scripts: Bag<string> = {
-    lint: 'gts lint',
-    clean: 'gts clean',
+    lint: 'wsts lint',
+    clean: 'wsts clean',
     compile: 'tsc',
-    fix: 'gts fix',
+    fix: 'wsts fix',
     prepare: `${pkgManager} run compile`,
     pretest: `${pkgManager} run compile`,
     posttest: `${pkgManager} run lint`,
@@ -124,7 +124,7 @@ export async function addDependencies(
 ): Promise<boolean> {
   let edits = false;
   const deps: DefaultPackage = {
-    gts: `^${pkg.version}`,
+    wsts: `^${pkg.version}`,
     typescript: pkg.devDependencies.typescript,
     '@types/node': pkg.devDependencies['@types/node'],
   };
@@ -178,7 +178,7 @@ async function writePackageJson(
 }
 
 export const ESLINT_CONFIG = {
-  extends: './node_modules/gts/',
+  extends: './node_modules/wsts/',
 };
 
 export const ESLINT_IGNORE = 'build/\n';
@@ -236,7 +236,7 @@ async function generateESLintIgnore(options: Options): Promise<void> {
 
 async function generateTsConfig(options: Options): Promise<void> {
   const config = formatJson({
-    extends: './node_modules/gts/tsconfig-google.json',
+    extends: './node_modules/wsts/tsconfig-widesky.json',
     compilerOptions: {rootDir: '.', outDir: 'build'},
     include: ['src/**/*.ts', 'test/**/*.ts'],
   });
@@ -245,7 +245,7 @@ async function generateTsConfig(options: Options): Promise<void> {
 
 async function generatePrettierConfig(options: Options): Promise<void> {
   const style = `module.exports = {
-  ...require('gts/.prettierrc.json')
+  ...require('wsts/.prettierrc.json')
 }
 `;
   return generateConfigFile(options, './.prettierrc.js', style);

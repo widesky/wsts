@@ -31,7 +31,7 @@ export interface Logger {
 
 export interface Options {
   dryRun: boolean;
-  gtsRootDir: string;
+  wstsRootDir: string;
   targetRootDir: string;
   yes: boolean;
   no: boolean;
@@ -50,7 +50,7 @@ const logger: Logger = console;
 const cli = meow({
   help: `
 	Usage
-	  $ gts <verb> [<file>...] [options]
+	  $ wsts <verb> [<file>...] [options]
 
     Verb can be:
       init        Adds default npm scripts to your package.json.
@@ -67,11 +67,11 @@ const cli = meow({
     --yarn        Use yarn instead of npm.
 
 	Examples
-    $ gts init -y
-    $ gts lint
-    $ gts fix
-    $ gts fix src/file1.ts src/file2.ts
-    $ gts clean`,
+    $ wsts init -y
+    $ wsts lint
+    $ wsts fix
+    $ wsts fix src/file1.ts src/file2.ts
+    $ wsts clean`,
   flags: {
     help: {type: 'boolean'},
     yes: {type: 'boolean', alias: 'y'},
@@ -103,7 +103,7 @@ export async function run(verb: string, files: string[]): Promise<boolean> {
   console.log(`version: ${nodeMajorVersion}`);
   if (nodeMajorVersion < 10) {
     throw new Error(
-      `gts requires node.js 10.x or up. You are currently running
+      `wsts requires node.js 10.x or up. You are currently running
       ${process.version}, which is not supported. Please upgrade to
       a safe, secure version of nodejs!`
     );
@@ -112,7 +112,7 @@ export async function run(verb: string, files: string[]): Promise<boolean> {
   const options = {
     dryRun: cli.flags.dryRun || false,
     // Paths are relative to the transpiled output files.
-    gtsRootDir: path.resolve(__dirname, '../..'),
+    wstsRootDir: path.resolve(__dirname, '../..'),
     targetRootDir: process.cwd(),
     yes: cli.flags.yes || cli.flags.y || false,
     no: cli.flags.no || cli.flags.n || false,
