@@ -91,7 +91,10 @@ describe('🚰 kitchen sink', () => {
             'utf8'
         );
         const tsconfig = JSON.parse(tsconfigJson);
-        assert.deepStrictEqual(tsconfig.extends, './node_modules/wsts/tsconfig-widesky.json');
+        assert.deepStrictEqual(
+            tsconfig.extends,
+            './node_modules/@widesky/wsts/tsconfig-widesky.json'
+        );
 
         // server.ts has a lint error. Should error.
         assert.throws(() => cp.execSync(`${WSTS} lint src/server.ts`, opts));
