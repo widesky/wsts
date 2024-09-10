@@ -30,7 +30,7 @@ import {
 } from './util';
 
 import {Options} from './cli';
-import {PackageJson} from '@npm/types';
+import {PackageJSON} from '@npm/types';
 import chalk = require('chalk');
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -38,7 +38,7 @@ const pkg = require('../../package.json');
 
 const ncpp = util.promisify(ncp);
 
-const DEFAULT_PACKAGE_JSON: PackageJson = {
+const DEFAULT_PACKAGE_JSON: PackageJSON = {
     name: '',
     version: '0.0.0',
     description: '',
@@ -75,7 +75,7 @@ async function query(
     return answers.query;
 }
 
-export async function addScripts(packageJson: PackageJson, options: Options): Promise<boolean> {
+export async function addScripts(packageJson: PackageJSON, options: Options): Promise<boolean> {
     let edits = false;
     const pkgManager = getPkgManagerCommand(options.yarn);
     const scripts: Bag<string> = {
@@ -116,7 +116,7 @@ export async function addScripts(packageJson: PackageJson, options: Options): Pr
 }
 
 export async function addDependencies(
-    packageJson: PackageJson,
+    packageJson: PackageJSON,
     options: Options
 ): Promise<boolean> {
     let edits = false;
@@ -159,7 +159,7 @@ function formatJson(object: {}) {
     return `${json}\n`;
 }
 
-async function writePackageJson(packageJson: PackageJson, options: Options): Promise<void> {
+async function writePackageJson(packageJson: PackageJSON, options: Options): Promise<void> {
     options.logger.log('Writing package.json...');
     if (!options.dryRun) {
         await writeFileAtomic('./package.json', formatJson(packageJson));
